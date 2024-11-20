@@ -7,18 +7,15 @@ import 'package:nesa_screening/data_layer/product_repository.dart';
 part 'home_event.dart';
 part 'home_state.dart';
 
-
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   HomeBloc(this.productRespository) : super(const HomeState()) {
     on<ProductListFetchedEvent>(_onProductListFetched);
   }
   final ProductRepository productRespository;
   void _onProductListFetched(
-      ProductListFetchedEvent event, Emitter<HomeState> emit) {
+      ProductListFetchedEvent event, Emitter<HomeState> emit) async {
     emit(state.copyWith(status: HomePageStatus.loading));
-    productRespository.fetchProductList().then((_) {
-      emit(
-          state.copyWith(productList: List.of(productRespository.productList)));
-    });
+    await productRespository.fetchProductList();
+    emit(state.copyWith(categoryMap: productRespository.getCategoryMap));
   }
 }

@@ -12,17 +12,17 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return  RepositoryProvider(
+    return RepositoryProvider(
       create: (context) => ProductRepository(),
-      child:  MaterialApp(
+      child: MaterialApp(
         theme: ThemeData(
-        useMaterial3: true,
-        brightness: Brightness.light,
-        colorSchemeSeed: Colors.purple,
-      ),
+          useMaterial3: true,
+          brightness: Brightness.light,
+          colorSchemeSeed: Colors.purple,
+        ),
+        debugShowCheckedModeBanner: false,
         home: const HomePage(),
       ),
     );
   }
 }
-

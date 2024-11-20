@@ -5,18 +5,18 @@ enum HomePageStatus { initial, loading, success }
 class HomeState extends Equatable {
   const HomeState({
     this.status = HomePageStatus.initial,
-    this.productList = const <Product>[],
+    this.categoryMap  = const {},
   });
 
   final HomePageStatus status;
-  final List<Product> productList;
+  final Map<String,List<Product>> categoryMap;
 
-  HomeState copyWith({HomePageStatus? status, List<Product>? productList}) {
+  HomeState copyWith({HomePageStatus? status, Map<String,List<Product>>? categoryMap}) {
     return HomeState(
         status: status ?? this.status,
-        productList: productList ?? this.productList);
+        categoryMap: categoryMap ?? this.categoryMap);
   }
 
   @override
-  List<Object?> get props => [status, productList];
+  List<Object?> get props => [status, categoryMap];
 }

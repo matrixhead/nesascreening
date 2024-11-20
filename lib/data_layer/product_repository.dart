@@ -3,7 +3,7 @@ import 'package:nesa_screening/data_layer/models.dart';
 import 'dart:convert';
 
 const String url = "dummyjson.com";
-const int limit = 10;
+const int limit = 100;
 
 class ProductRepository {
   final http.Client _httpClient;
@@ -18,7 +18,7 @@ class ProductRepository {
     int skip = 0,
   }) async {
     Uri uri = Uri.http(url, 'products', <String, String>{
-      'limit': '$limit',
+      // 'limit': '$limit',
       'skip': '$skip',
     });
 
@@ -30,5 +30,17 @@ class ProductRepository {
     }
     // todo: improve error handling
     throw Exception();
+  }
+
+  Map<String,List<Product>> get getCategoryMap{
+    Map<String,List<Product>> categoryMap = {};
+    for (final product in productList){
+      if (categoryMap.containsKey(product.category)){
+        categoryMap[product.category]!.add(product);
+      }else{
+        categoryMap[product.category] = [product];
+      }
+    }
+    return categoryMap;
   }
 }
