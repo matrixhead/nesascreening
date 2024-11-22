@@ -8,12 +8,20 @@ part 'product_details_state.dart';
 
 class ProductDetailsBloc extends Bloc<ProductDetailsEvent, ProductDetailsState> {
   
-  ProductDetailsBloc(this.productRepository, product) : super(ProductDetailsState(product)) {
-    on<ProductDetailsEvent>((event, emit) {
-      // TODO: implement event handler
-    });
+  ProductDetailsBloc(this.productRepository, this.productId) : super( ProductDetailsStateInitial()) {
+    on<FetchProductDetailsEvent>(onProductDetailsfetched);
   }
+
+
+
+
+  final int productId;
 
   final ProductRepository productRepository;
 
+  onProductDetailsfetched(event, emit) async {
+      emit(ProductDetailsStateInitial());
+      final product = await productRepository.fetchProduct(id: productId);
+      emit(ProductDetailsStateLoaded(product));
+    }
 }

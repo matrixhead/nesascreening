@@ -2,133 +2,183 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nesa_screening/data_layer/models.dart';
 import 'package:nesa_screening/data_layer/product_repository.dart';
+import 'package:nesa_screening/edit_product/edit_page.dart';
 import 'package:nesa_screening/product_details/bloc/product_details_bloc.dart';
+import 'package:nesa_screening/widgets/widgets.dart';
 
 class ProductDetailsPage extends StatelessWidget {
   const ProductDetailsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final product = ModalRoute.of(context)!.settings.arguments as Product;
+    final productId = ModalRoute.of(context)!.settings.arguments as int;
     return BlocProvider(
       create: (context) => ProductDetailsBloc(
         context.read<ProductRepository>(),
-        product,
-      ),
+        productId,
+      )..add(FetchProductDetailsEvent()),
       child: Scaffold(
-        body: Stack(
-          children: [
-            Column(
+        resizeToAvoidBottomInset: false,
+        body: BlocBuilder<ProductDetailsBloc, ProductDetailsState>(
+          builder: (context, state) {
+            if (state is ProductDetailsStateInitial) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            state as ProductDetailsStateLoaded;
+            return Stack(
               children: [
-                Expanded(
-                    child: Image.asset(
-                  "assets/images/bg.png",
-                  color: Colors.black.withOpacity(.04),
-                )),
-                Expanded(
-                    child: Container(
-                  color: Colors.indigo[300],
-                ))
-              ],
-            ),
-            SafeArea(
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  Expanded(
-                    flex: 9,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16.0, vertical: 8),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
+                Column(
+                  children: [
+                    Expanded(
+                        child: Image.asset(
+                      "assets/images/bg.png",
+                      color: Colors.black.withOpacity(.04),
+                    )),
+                    Expanded(
+                        child: Container(
+                      color: Colors.indigo[300],
+                    ))
+                  ],
+                ),
+                SafeArea(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Expanded(
+                        flex: 10,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16.0, vertical: 8),
+                          child: Column(
                             mainAxisSize: MainAxisSize.max,
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const SizedBox.square(
-                                  dimension: 32,
-                                  child: RoundedButton(
-                                      child: Icon(
-                                    Icons.arrow_back_ios_new,
-                                    size: 20,
-                                    // color: Colors.black,
-                                  ))),
-                              SizedBox.square(
-                                  dimension: 32,
-                                  child: IconButton(
-                                      onPressed: () {},
-                                      icon: const Icon(
-                                        Icons.favorite_outline,
+                              Row(
+                                mainAxisSize: MainAxisSize.max,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const SizedBox.square(
+                                      dimension: 32,
+                                      child: RoundedButton(
+                                          child: Icon(
+                                        Icons.arrow_back_ios_new,
                                         size: 20,
+                                        // color: Colors.black,
                                       ))),
+                                  Row(
+                                    children: [
+                                      SizedBox.square(
+                                          dimension: 32,
+                                          child: IconButton(
+                                              onPressed: () {
+                                                final bloc = context
+                                                    .read<ProductDetailsBloc>();
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            const EditPage(),
+                                                        settings: RouteSettings(
+                                                          arguments:
+                                                              state.product.id,
+                                                        ))).then((isDirty) {
+                                                  isDirty as bool;
+                                                  if (isDirty) {
+                                                    bloc.add(
+                                                        FetchProductDetailsEvent());
+                                                  }
+                                                });
+                                              },
+                                              icon: const Icon(
+                                                Icons.edit_outlined,
+                                                size: 20,
+                                              ))),
+                                      SizedBox.square(
+                                          dimension: 32,
+                                          child: IconButton(
+                                              onPressed: () {},
+                                              icon: const Icon(
+                                                Icons.favorite_outline,
+                                                size: 20,
+                                              ))),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              Expanded(
+                                  child: ProductImageViewer(
+                                      product: state.product)),
                             ],
                           ),
-                          Expanded(child: ProductImageViewer(product: product)),
-                        ],
+                        ),
                       ),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 16,
-                    child: Stack(
-                      children: [
-                        Positioned(
-                            top: 10,
-                            left: 16,
-                            child: DefaultTextStyle.merge(
-                                style: const TextStyle(
-                                    color: Colors.blue,
-                                    fontWeight: FontWeight.w800,
-                                    fontSize: 20),
-                                child: Text("\$ ${product.price}"))),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.max,
+                      Expanded(
+                        flex: 16,
+                        child: Stack(
                           children: [
-                            Expanded(
-                              child: ClipPath(
-                                clipper: Clipper(),
-                                child: const ProductInfo(),
-                              ),
+                            Positioned(
+                                top: 10,
+                                left: 16,
+                                child: DefaultTextStyle.merge(
+                                    style: const TextStyle(
+                                        color: Colors.blue,
+                                        fontWeight: FontWeight.w800,
+                                        fontSize: 20),
+                                    child: Text("\$ ${state.product.price}"))),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.max,
+                              children: [
+                                Expanded(
+                                  child: ClipPath(
+                                    clipper: Clipper(),
+                                    child: const ProductInfo(),
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16,vertical: 16),
-                    child: RoundedButton(
-                      color: Colors.purple[900],
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(Icons.shopping_cart_outlined,color: Colors.white,),
-                            const SizedBox(width: 8,),
-                            DefaultTextStyle.merge(
-                                        style: const TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w400,
-                                            fontSize: 14),
-                                        child: const Text("ADD TO CART")),
-                          ],
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 16),
+                        child: RoundedButton(
+                          color: Colors.purple[900],
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.max,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  Icons.shopping_cart_outlined,
+                                  color: Colors.white,
+                                ),
+                                const SizedBox(
+                                  width: 8,
+                                ),
+                                DefaultTextStyle.merge(
+                                    style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 14),
+                                    child: const Text("ADD TO CART")),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
-                    ),
+                      const SizedBox(
+                        height: 16,
+                      )
+                    ],
                   ),
-                  const SizedBox(
-                    height: 16,
-                  )
-                ],
-              ),
-            ),
-          ],
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
@@ -144,6 +194,7 @@ class ProductInfo extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<ProductDetailsBloc, ProductDetailsState>(
       builder: (context, state) {
+        state as ProductDetailsStateLoaded;
         return Container(
           color: Colors.white,
           constraints: const BoxConstraints.expand(),
@@ -364,7 +415,7 @@ class _ProductImageViewerState extends State<ProductImageViewer> {
       children: [
         Expanded(child: Container()),
         Expanded(
-          flex: 2,
+          flex: 4,
           child: Stack(
             children: [
               Halo(
@@ -375,57 +426,43 @@ class _ProductImageViewerState extends State<ProductImageViewer> {
           ),
         ),
         Expanded(
-          child: Column(
-            children: List<Widget>.generate(3, (i) {
-              return Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(4.0),
-                  child: InkWell(
-                    onTap: () {
-                      setState(() {
-                        currentSelected = i;
-                      });
-                    },
-                    child: Container(
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            border: i == currentSelected ? Border.all() : null,
-                            color: colors[i]),
-                        child: Image.network(widget.product.thumbnail)),
+          child: Align(
+            alignment: Alignment.centerRight,
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List<Widget>.generate(3, (i) {
+                return Flexible(
+                  child: Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: InkWell(
+                      onTap: () {
+                        setState(() {
+                          currentSelected = i;
+                        });
+                      },
+                      child: AspectRatio(
+                        aspectRatio: 1,
+                        child: Container(
+                          constraints: const BoxConstraints.expand(),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              border:
+                                  i == currentSelected ? Border.all() : null,
+                              color: colors[i]),
+                          child: Image.network(widget.product.thumbnail),
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-              );
-            }).toList(),
+                );
+              }).toList(),
+            ),
           ),
         )
       ],
     );
     // return Container();
-  }
-}
-
-class RoundedButton extends StatelessWidget {
-  const RoundedButton(
-      {super.key, required this.child, this.elevation, this.color});
-
-  final Widget child;
-  final double? elevation;
-  final Color? color;
-
-  @override
-  Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: () {},
-      style: ElevatedButton.styleFrom(
-        backgroundColor: color,
-        elevation: elevation,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8), // Square with rounded corners
-        ),
-        padding: EdgeInsets.zero, // Remove default padding
-      ),
-      child: child,
-    );
   }
 }
 

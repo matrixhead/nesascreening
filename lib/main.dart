@@ -12,8 +12,9 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final productRepo = ProductRepository();
     return RepositoryProvider(
-      create: (context) => ProductRepository(),
+      create: (context) => productRepo,
       child: MaterialApp(
         theme: ThemeData(
           useMaterial3: true,
