@@ -437,7 +437,13 @@ class _ProductImageViewerState extends State<ProductImageViewer> {
               Halo(
                 color: colors[currentSelected]!,
               ),
-              Positioned.fill(child: Image.network(widget.product.thumbnail))
+              Positioned.fill(
+                  child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Image.network(
+                  widget.product.thumbnail,
+                ),
+              ))
             ],
           ),
         ),

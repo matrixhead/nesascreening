@@ -237,12 +237,13 @@ class ProductCard extends StatelessWidget {
                           mainAxisSize:
                               MainAxisSize.min,
                           children: [
-                            SizedBox(
-                              width:
-                                  constraints.maxWidth *
-                                      .5,
-                              child: Image.network(
-                                  product.thumbnail),
+                            Expanded(
+                              child: SizedBox(
+                                width:
+                                    constraints.maxWidth *
+                                        .5,
+                                child:FadeInImage.assetNetwork(placeholder: "assets/images/image-placeholder.png", image: product.thumbnail),
+                              ),
                             ),
                             DefaultTextStyle.merge(
                                 style: const TextStyle(

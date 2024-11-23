@@ -25,7 +25,7 @@ class ProductRepository {
     }
 
     while (tryAgain) {
-      Uri uri = Uri.http(url, 'products', <String, String>{
+      Uri uri = Uri.https(url, 'products', <String, String>{
         'limit': '$limit',
         'skip': '${products.length}',
       });
