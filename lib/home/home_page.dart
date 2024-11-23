@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:nesa_screening/data_layer/models.dart';
 import 'package:nesa_screening/data_layer/product_repository.dart';
 import 'package:nesa_screening/home/bloc/home_bloc.dart';
 import 'package:nesa_screening/product_details/product_details.dart';
@@ -12,10 +13,9 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => HomeBloc(context.read<ProductRepository>())
-        ..add(HomeInitEvent()),
-      child: const Scaffold(
-          body: ScrollView()),
+      create: (context) =>
+          HomeBloc(context.read<ProductRepository>())..add(HomeInitEvent()),
+      child: const Scaffold(body: ScrollView()),
     );
   }
 }
@@ -32,7 +32,7 @@ class ScrollView extends StatefulWidget {
 class _ScrollViewState extends State<ScrollView> {
   final _scrollController = ScrollController();
 
-    @override
+  @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
@@ -42,179 +42,28 @@ class _ScrollViewState extends State<ScrollView> {
   Widget build(BuildContext context) {
     return CustomScrollView(
       controller: _scrollController,
-            slivers: [
-    SliverAppBar(
-      pinned: true,
-      expandedHeight: 280,
-      leading: IconButton(onPressed: () {}, icon: const Icon(Icons.menu)),
-      actions: [
-        IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.shopping_cart_outlined))
-      ],
-      flexibleSpace: const FlexibleSpaceBar(
-        background: SafeArea(
-            child: Padding(
-                padding: EdgeInsets.only(left: 18),
-                child: WelcomeText())),
-      ),
-    ),
-    BlocBuilder<HomeBloc, HomeState>(
-      builder: (context, state) {
-        final categories = state.categoryMap.keys.toList();
-        return SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (BuildContext context, int index) {
-              if (index >= state.categoryMap.length){
-                return Center(child: CircularProgressIndicator());
-              }
-              final category = categories[index];
-              final categoryItems = state.categoryMap[category]!;
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 18),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        DefaultTextStyle.merge(
-                            style: const TextStyle(
-                                fontWeight: FontWeight.w900,
-                                fontSize: 18),
-                            child: Text(
-                              "${category[0].toUpperCase()}${category.substring(1).toLowerCase()}",
-                            )),
-                        DefaultTextStyle.merge(
-                            style: TextStyle(
-                                color: Colors.indigo[600],
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500),
-                            child: InkWell(
-                                onTap: () {},
-                                child: const Text(
-                                  "Show All",
-                                ))),
-                      ],
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 4, bottom: 16),
-                      child: SizedBox(
-                        height: 280,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: categoryItems.length,
-                          itemBuilder: (context, index) {
-                            return Padding(
-                              padding: const EdgeInsets.only(right: 12),
-                              child: AspectRatio(
-                                  aspectRatio: 22 / 30,
-                                  child: InkWell(
-                                    onTap: () {
-                                      final bloc = context.read<HomeBloc>();
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const ProductDetailsPage(),
-                                              settings: RouteSettings(
-                                                  arguments:
-                                                      categoryItems[index]
-                                                          .id))).then((val){
-                                                            bloc.add(HomeRefreshEvent());
-                                                          });
-                                    },
-                                    child: Card(
-                                      elevation: 2,
-                                      child: DefaultTextStyle.merge(
-                                        textAlign: TextAlign.center,
-                                        child: Padding(
-                                          padding:
-                                              const EdgeInsets.all(8.0),
-                                          child: Stack(
-                                            children: [
-                                              Positioned(
-                                                  right: 0,
-                                                  child: IconButton(
-                                                      onPressed: () {},
-                                                      icon: const Icon(Icons
-                                                          .favorite_border))),
-                                              Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceEvenly,
-                                                children: [
-                                                  SizedBox(
-                                                      height: 95,
-                                                      child: Image.network(
-                                                          categoryItems[
-                                                                  index]
-                                                              .thumbnail)),
-                                                  DefaultTextStyle.merge(
-                                                      style:
-                                                          const TextStyle(
-                                                        fontWeight:
-                                                            FontWeight
-                                                                .w500,
-                                                        fontSize: 15,
-                                                      ),
-                                                      maxLines: 2,
-                                                      child: Text(
-                                                        categoryItems[
-                                                                index]
-                                                            .title,
-                                                      )),
-                                                  DefaultTextStyle.merge(
-                                                      style:
-                                                          const TextStyle(
-                                                              fontSize:
-                                                                  12),
-                                                      child: Text(
-                                                        categoryItems[
-                                                                index]
-                                                            .description,
-                                                        overflow:
-                                                            TextOverflow
-                                                                .fade,
-                                                        maxLines: 3,
-                                                        softWrap: true,
-                                                      )),
-                                                  DefaultTextStyle.merge(
-                                                    style:
-                                                        const TextStyle(
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .w900,
-                                                            fontSize: 15),
-                                                    child: Text(
-                                                        "\$ ${categoryItems[index].price.toString()}"),
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  )),
-                            );
-                          },
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-              );
-            },
-            childCount: state.hasReachedMax ?  state.categoryMap.length : state.categoryMap.length + 1,
+      slivers: [
+        SliverAppBar(
+          pinned: true,
+          expandedHeight: 280,
+          leading: IconButton(onPressed: () {}, icon: const Icon(Icons.menu)),
+          actions: [
+            IconButton(
+                onPressed: () {},
+                icon: const Icon(Icons.shopping_cart_outlined))
+          ],
+          flexibleSpace: const FlexibleSpaceBar(
+            background: SafeArea(
+                child: Padding(
+                    padding: EdgeInsets.only(left: 18), child: WelcomeText())),
           ),
-        );
-      },
-    ),
-            ],
-          );
+        ),
+        const CategoryList(),
+      ],
+    );
   }
 
-    @override
+  @override
   void dispose() {
     _scrollController.dispose();
     super.dispose();
@@ -229,6 +78,217 @@ class _ScrollViewState extends State<ScrollView> {
     final maxScroll = _scrollController.position.maxScrollExtent;
     final currentScroll = _scrollController.offset;
     return currentScroll >= (maxScroll * 0.9);
+  }
+}
+
+class CategoryList extends StatelessWidget {
+  const CategoryList({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<HomeBloc, HomeState>(
+      builder: (context, state) {
+        final categories = state.categoryMap.keys.toList();
+        return SliverList(
+          delegate: SliverChildBuilderDelegate(
+            (BuildContext context, int index) {
+              if (index >= state.categoryMap.length) {
+                return const Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Center(child: CircularProgressIndicator()),
+                );
+              }
+              final category = categories[index];
+              final categoryItems = state.categoryMap[category]!;
+              return CategoryCard(
+                  category: category, categoryItems: categoryItems);
+            },
+            childCount: state.hasReachedMax
+                ? state.categoryMap.length
+                : state.categoryMap.length + 1,
+          ),
+        );
+      },
+    );
+  }
+}
+
+class CategoryCard extends StatelessWidget {
+  const CategoryCard({
+    super.key,
+    required this.category,
+    required this.categoryItems,
+  });
+
+  final String category;
+  final List<Product> categoryItems;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 18),
+      child: SizedBox(
+        height: 280,
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                DefaultTextStyle.merge(
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w900, fontSize: 18),
+                    child: Text(
+                      textScaler: TextScaler.noScaling,
+                      "${category[0].toUpperCase()}${category.substring(1).toLowerCase()}",
+                    )),
+                DefaultTextStyle.merge(
+                    style: TextStyle(
+                        color: Colors.indigo[600],
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500),
+                    child: InkWell(
+                        onTap: () {},
+                        child: const Text(
+                          "Show All",
+                        ))),
+              ],
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 4, bottom: 16),
+                child: LayoutBuilder(builder: (context, constraints) {
+                  return ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: categoryItems.length,
+                    itemBuilder: (context, index) {
+                      final product = categoryItems[index];
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 12),
+                        child: Align(
+                          child: SizedBox(
+                            width: (constraints.maxWidth / 2) * .95,
+                            child: ProductCard(product: product),
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                }),
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ProductCard extends StatelessWidget {
+  const ProductCard({
+    super.key,
+    required this.product,
+  });
+
+  final Product product;
+
+  @override
+  Widget build(BuildContext context) {
+    return AspectRatio(
+      aspectRatio: 23 / 30,
+      child: InkWell(
+        onTap: () {
+          final bloc = context.read<HomeBloc>();
+          Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          const ProductDetailsPage(),
+                      settings: RouteSettings(
+                          arguments: product.id)))
+              .then((val) {
+            bloc.add(HomeRefreshEvent());
+          });
+        },
+        child: Card(
+          elevation: 2,
+          child: DefaultTextStyle.merge(
+            textAlign: TextAlign.center,
+            child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Stack(
+                  children: [
+                    Positioned(
+                        right: -12,
+                        top: -12,
+                        child: IconButton(
+                            iconSize: 18,
+                            onPressed: () {},
+                            icon: const Icon(Icons
+                                .favorite_border))),
+                    Positioned.fill(
+                      child: LayoutBuilder(builder:
+                          (context, constraints) {
+                        return Column(
+                          mainAxisAlignment:
+                              MainAxisAlignment
+                                  .spaceEvenly,
+                          mainAxisSize:
+                              MainAxisSize.min,
+                          children: [
+                            SizedBox(
+                              width:
+                                  constraints.maxWidth *
+                                      .5,
+                              child: Image.network(
+                                  product.thumbnail),
+                            ),
+                            DefaultTextStyle.merge(
+                                style: const TextStyle(
+                                    fontWeight:
+                                        FontWeight.w500,
+                                    fontSize: 13),
+                                maxLines: 2,
+                                child: Text(
+                                  textScaler: TextScaler
+                                      .noScaling,
+                                  product.title,
+                                )),
+                            DefaultTextStyle.merge(
+                                style: const TextStyle(
+                                    fontSize: 9),
+                                child: Text(
+                                  product.description,
+                                  overflow:
+                                      TextOverflow.fade,
+                                  maxLines: 3,
+                                  softWrap: true,
+                                  textScaler: TextScaler
+                                      .noScaling,
+                                )),
+                            DefaultTextStyle.merge(
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight:
+                                    FontWeight.w900,
+                              ),
+                              child: Text(
+                                "\$ ${product.price.toString()}",
+                                textScaler: TextScaler
+                                    .noScaling,
+                              ),
+                            ),
+                          ],
+                        );
+                      }),
+                    ),
+                  ],
+                )),
+          ),
+        ),
+      ),
+    );
   }
 }
 

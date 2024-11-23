@@ -53,59 +53,7 @@ class ProductDetailsPage extends StatelessWidget {
                             mainAxisSize: MainAxisSize.max,
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Row(
-                                mainAxisSize: MainAxisSize.max,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const SizedBox.square(
-                                      dimension: 32,
-                                      child: RoundedButton(
-                                          child: Icon(
-                                        Icons.arrow_back_ios_new,
-                                        size: 20,
-                                        // color: Colors.black,
-                                      ))),
-                                  Row(
-                                    children: [
-                                      SizedBox.square(
-                                          dimension: 32,
-                                          child: IconButton(
-                                              onPressed: () {
-                                                final bloc = context
-                                                    .read<ProductDetailsBloc>();
-                                                Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            const EditPage(),
-                                                        settings: RouteSettings(
-                                                          arguments:
-                                                              state.product.id,
-                                                        ))).then((isDirty) {
-                                                  isDirty as bool;
-                                                  if (isDirty) {
-                                                    bloc.add(
-                                                        FetchProductDetailsEvent());
-                                                  }
-                                                });
-                                              },
-                                              icon: const Icon(
-                                                Icons.edit_outlined,
-                                                size: 20,
-                                              ))),
-                                      SizedBox.square(
-                                          dimension: 32,
-                                          child: IconButton(
-                                              onPressed: () {},
-                                              icon: const Icon(
-                                                Icons.favorite_outline,
-                                                size: 20,
-                                              ))),
-                                    ],
-                                  ),
-                                ],
-                              ),
+                              const AppBar(),
                               Expanded(
                                   child: ProductImageViewer(
                                       product: state.product)),
@@ -185,6 +133,72 @@ class ProductDetailsPage extends StatelessWidget {
   }
 }
 
+class AppBar extends StatelessWidget {
+  const AppBar({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<ProductDetailsBloc, ProductDetailsState>(
+      builder: (context, state) {
+        state as ProductDetailsStateLoaded;
+        return Row(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            SizedBox.square(
+                dimension: 32,
+                child: RoundedButton(
+                    ontap: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Icon(
+                      Icons.arrow_back_ios_new,
+                      size: 20,
+                      // color: Colors.black,
+                    ))),
+            Row(
+              children: [
+                SizedBox.square(
+                    dimension: 32,
+                    child: IconButton(
+                        onPressed: () {
+                          final bloc = context.read<ProductDetailsBloc>();
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const EditPage(),
+                                  settings: RouteSettings(
+                                    arguments: state.product.id,
+                                  ))).then((isDirty) {
+                            isDirty as bool;
+                            if (isDirty) {
+                              bloc.add(FetchProductDetailsEvent());
+                            }
+                          });
+                        },
+                        icon: const Icon(
+                          Icons.edit_outlined,
+                          size: 20,
+                        ))),
+                SizedBox.square(
+                    dimension: 32,
+                    child: IconButton(
+                        onPressed: () {},
+                        icon: const Icon(
+                          Icons.favorite_outline,
+                          size: 20,
+                        ))),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
 class ProductInfo extends StatelessWidget {
   const ProductInfo({
     super.key,
@@ -200,161 +214,163 @@ class ProductInfo extends StatelessWidget {
           constraints: const BoxConstraints.expand(),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(
-                  height: 70,
-                ),
-                const Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    BestSellerBadge(),
-                    SizedBox(
-                      width: 16,
-                    )
-                  ],
-                ),
-                const SizedBox(
-                  height: 4,
-                ),
-                SizedBox(
-                  width: 300,
-                  child: DefaultTextStyle.merge(
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(
+                    height: 70,
+                  ),
+                  const Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      BestSellerBadge(),
+                      SizedBox(
+                        width: 16,
+                      )
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 4,
+                  ),
+                  SizedBox(
+                    width: 300,
+                    child: DefaultTextStyle.merge(
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w900,
+                          fontSize: 18,
+                          overflow: TextOverflow.clip,
+                        ),
+                        child: Text(
+                          state.product.title,
+                          maxLines: 1,
+                        )),
+                  ),
+                  const SizedBox(
+                    height: 8,
+                  ),
+                  DefaultTextStyle.merge(
                       style: const TextStyle(
-                        fontWeight: FontWeight.w900,
-                        fontSize: 18,
-                        overflow: TextOverflow.clip,
-                      ),
-                      child: Text(
-                        state.product.title,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 12,
+                          overflow: TextOverflow.clip,
+                          color: Colors.grey),
+                      child: const Text(
+                        "About the item",
                         maxLines: 1,
                       )),
-                ),
-                const SizedBox(
-                  height: 8,
-                ),
-                DefaultTextStyle.merge(
-                    style: const TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 12,
-                        overflow: TextOverflow.clip,
-                        color: Colors.grey),
-                    child: const Text(
-                      "About the item",
-                      maxLines: 1,
-                    )),
-                const SizedBox(
-                  height: 8,
-                ),
-                Row(
-                  children: [
-                    RoundedButton(
-                      elevation: 0,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  const SizedBox(
+                    height: 8,
+                  ),
+                  Row(
+                    children: [
+                      RoundedButton(
+                        elevation: 0,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                          child: DefaultTextStyle.merge(
+                              style: const TextStyle(
+                                fontSize: 12,
+                              ),
+                              child: const Text(
+                                "Full Specification",
+                              )),
+                        ),
+                      ),
+                      // this should be a button
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
                         child: DefaultTextStyle.merge(
                             style: const TextStyle(
                               fontSize: 12,
                             ),
                             child: const Text(
-                              "Full Specification",
+                              "Reviews",
                             )),
                       ),
-                    ),
-                    // this should be a button
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 8,
+                  ),
+                  SizedBox(
+                    height: 60,
+                    child: SingleChildScrollView(
                       child: DefaultTextStyle.merge(
                           style: const TextStyle(
                             fontSize: 12,
                           ),
-                          child: const Text(
-                            "Reviews",
+                          child: Text(
+                            state.product.description,
                           )),
                     ),
-                  ],
-                ),
-                const SizedBox(
-                  height: 8,
-                ),
-                SizedBox(
-                  height: 60,
-                  child: SingleChildScrollView(
-                    child: DefaultTextStyle.merge(
-                        style: const TextStyle(
-                          fontSize: 12,
-                        ),
-                        child: Text(
-                          state.product.description,
-                        )),
                   ),
-                ),
-                const SizedBox(
-                  height: 16,
-                ),
-                Row(
-                  children: [
-                    SizedBox.square(
-                      dimension: 48,
-                      child: Container(
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: Colors.grey[850]),
-                        // This section displays the seller's location data.
-                        // In the reference example, they are using a MapView.
-                        // Here, I am using an icon instead, as implementing a full Map API
-                        // just to display this icon for the example would be excessive.
-                        child: const Icon(
-                          Icons.location_on_outlined,
-                          color: Colors.grey,
+                  const SizedBox(
+                    height: 16,
+                  ),
+                  Row(
+                    children: [
+                      SizedBox.square(
+                        dimension: 48,
+                        child: Container(
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: Colors.grey[850]),
+                          // This section displays the seller's location data.
+                          // In the reference example, they are using a MapView.
+                          // Here, I am using an icon instead, as implementing a full Map API
+                          // just to display this icon for the example would be excessive.
+                          child: const Icon(
+                            Icons.location_on_outlined,
+                            color: Colors.grey,
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(
-                      width: 8,
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        DefaultTextStyle.merge(
-                            style: const TextStyle(fontWeight: FontWeight.w400),
-                            child: const Text(
-                              "Aghmashenebeli Ave 75",
-                            )),
-                        const SizedBox(
-                          height: 4,
-                        ),
-                        DefaultTextStyle.merge(
-                            style: const TextStyle(
-                              fontSize: 10,
-                              color: Colors.grey,
-                              // fontWeight: FontWeight.w200
-                            ),
-                            child: const Text(
-                              "1 Item is in the way",
-                            )),
-                      ],
-                    ),
-                    const Expanded(
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: Icon(
-                          Icons.arrow_forward_ios,
-                          size: 18,
+                      const SizedBox(
+                        width: 8,
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          DefaultTextStyle.merge(
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.w400),
+                              child: const Text(
+                                "Aghmashenebeli Ave 75",
+                              )),
+                          const SizedBox(
+                            height: 4,
+                          ),
+                          DefaultTextStyle.merge(
+                              style: const TextStyle(
+                                fontSize: 10,
+                                color: Colors.grey,
+                              ),
+                              child: const Text(
+                                "1 Item is in the way",
+                              )),
+                        ],
+                      ),
+                      const Expanded(
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: Icon(
+                            Icons.arrow_forward_ios,
+                            size: 18,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(
-                  width: 8,
-                ),
-                Divider(
-                  color: Colors.grey[200],
-                )
-              ],
+                    ],
+                  ),
+                  const SizedBox(
+                    width: 8,
+                  ),
+                  Divider(
+                    color: Colors.grey[200],
+                  )
+                ],
+              ),
             ),
           ),
         );
